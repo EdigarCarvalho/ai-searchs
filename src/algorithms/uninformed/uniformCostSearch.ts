@@ -22,7 +22,7 @@ class PriorityQueue<T> {
     }
 }
 
-export function uniformCostSearch(graph: Graph, startNodeId: string): SearchResult {
+export function uniformCostSearch(graph: Graph, startNodeId: string, goalNodeId: string = 'Bucharest'): SearchResult {
     const priorityQueue = new PriorityQueue<string>();
     priorityQueue.enqueue(startNodeId, 0);
     
@@ -37,6 +37,11 @@ export function uniformCostSearch(graph: Graph, startNodeId: string): SearchResu
         const current = priorityQueue.dequeue();
         
         if (!current) continue;
+        
+        // If we found the goal, reconstruct the path and return
+        if (current === goalNodeId) {
+            return reconstructPath(startNodeId, goalNodeId, previous, distances);
+        }
         
         if (visited.has(current)) continue;
         
@@ -57,17 +62,32 @@ export function uniformCostSearch(graph: Graph, startNodeId: string): SearchResu
         }
     }
     
-    // Reconstruct path
-    const resultPath: string[] = [];
-    let currentNode: string | null = visited.size > 0 ? Array.from(visited)[visited.size - 1] : null;
+    // If we didn't find a path to the goal
+    return new SearchResult([], 0);
+}
+
+function reconstructPath(
+    startNodeId: string, 
+    goalNodeId: string, 
+    previous: Map<string, string | null>,
+    distances: Map<string, number>
+): SearchResult {
+    const path: string[] = [];
+    let current = goalNodeId;
     
-    while (currentNode) {
-        resultPath.unshift(currentNode);
-        currentNode = previous.get(currentNode) || null;
+    // Reconstruct the path from goal to start
+    while (current && current !== startNodeId) {
+        path.unshift(current);
+        const prev = previous.get(current);
+        if (!prev) break;
+        current = prev;
     }
     
-    // Get the total distance for the last node in the path
-    const totalDistance = resultPath.length > 0 ? (distances.get(resultPath[resultPath.length - 1]) || 0) : 0;
+    // Add the start node
+    path.unshift(startNodeId);
     
-    return new SearchResult(resultPath, totalDistance);
+    // Get the total distance to the goal
+    const totalDistance = distances.get(goalNodeId) || 0;
+    
+    return new SearchResult(path, totalDistance);
 }

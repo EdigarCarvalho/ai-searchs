@@ -61,18 +61,18 @@ export async function setupEventHandlers() {
                 result = breadthFirstSearch(graph, startNode, endNode);
                 break;
             case 'ucs':
-                result = uniformCostSearch(graph, startNode);
+                result = uniformCostSearch(graph, startNode, endNode);
                 break;
             case 'dfs':
-                result = depthFirstSearch(graph, startNode);
+                result = depthFirstSearch(graph, startNode, endNode);
                 break;
             case 'lds':
-                const depthLimit = 10; // Default depth limit
-                result = limitedDepthSearch(graph, startNode, depthLimit);
+                const depthLimit = 15; // Increased depth limit for better path finding
+                result = limitedDepthSearch(graph, startNode, depthLimit, endNode);
                 break;
             case 'ids':
                 const maxDepth = 20; // Default max depth
-                result = iterativeDeepeningSearch(graph, startNode, maxDepth);
+                result = iterativeDeepeningSearch(graph, startNode, maxDepth, endNode);
                 break;
             case 'directional':
                 if (!endNode) {
