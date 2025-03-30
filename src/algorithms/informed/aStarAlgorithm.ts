@@ -3,13 +3,66 @@ import { SearchResult } from '../../models/SearchResult';
 
 type Heuristic = (a: string, b: string) => number;
 
+// Priority Queue for efficient node selection
+class PriorityQueue<T> {
+    private items: Array<{ item: T, priority: number }>;
+    private valueMap: Map<T, number>;
+
+    constructor() {
+        this.items = [];
+        this.valueMap = new Map();
+    }
+
+    enqueue(item: T, priority: number): void {
+        // Update priority if item already exists
+        if (this.valueMap.has(item)) {
+            this.remove(item);
+        }
+        
+        this.items.push({ item, priority });
+        this.valueMap.set(item, priority);
+        this.items.sort((a, b) => a.priority - b.priority);
+    }
+
+    dequeue(): T | undefined {
+        const result = this.items.shift()?.item;
+        if (result) {
+            this.valueMap.delete(result);
+        }
+        return result;
+    }
+
+    isEmpty(): boolean {
+        return this.items.length === 0;
+    }
+    
+    has(item: T): boolean {
+        return this.valueMap.has(item);
+    }
+    
+    remove(item: T): void {
+        const index = this.items.findIndex(i => i.item === item);
+        if (index !== -1) {
+            this.items.splice(index, 1);
+            this.valueMap.delete(item);
+        }
+    }
+}
+
 export function aStarAlgorithm(
     graph: Graph,
     startNodeId: string,
     goalNodeId: string,
     heuristic: Heuristic = (a, b) => 0
 ): SearchResult {
-    const openSet: string[] = [startNodeId];
+    // Quick check if start and end are the same
+    if (startNodeId === goalNodeId) {
+        return new SearchResult([startNodeId], 0);
+    }
+    
+    const openSet = new PriorityQueue<string>();
+    openSet.enqueue(startNodeId, heuristic(startNodeId, goalNodeId));
+    
     const cameFrom = new Map<string, string>();
     
     const gScore = new Map<string, number>();
@@ -18,31 +71,36 @@ export function aStarAlgorithm(
     const fScore = new Map<string, number>();
     fScore.set(startNodeId, heuristic(startNodeId, goalNodeId));
     
-    while (openSet.length > 0) {
-        // Find the node in openSet with the lowest fScore
-        let current = openSet.reduce((lowest, nodeId) => 
-            (fScore.get(nodeId) || Infinity) < (fScore.get(lowest) || Infinity) ? nodeId : lowest, 
-            openSet[0]
-        );
+    const closedSet = new Set<string>();
+    
+    while (!openSet.isEmpty()) {
+        // Get node with lowest fScore
+        const current = openSet.dequeue()!;
         
+        // If we found the goal, reconstruct and return the path
         if (current === goalNodeId) {
-            const totalPath = reconstructPath(cameFrom, current);
-            return new SearchResult(totalPath, gScore.get(current) || 0);
+            return reconstructPath(graph, cameFrom, startNodeId, goalNodeId, gScore.get(goalNodeId) || 0);
         }
         
-        openSet.splice(openSet.indexOf(current), 1);
+        closedSet.add(current);
         
+        // Explore neighbors
         for (const neighbor of graph.getNeighbors(current)) {
-            const tentativeGScore = (gScore.get(current) || Infinity) + neighbor.weight;
+            if (closedSet.has(neighbor.id)) {
+                continue; // Skip already evaluated nodes
+            }
             
-            if (!gScore.has(neighbor.id) || tentativeGScore < (gScore.get(neighbor.id) || Infinity)) {
+            const tentativeGScore = (gScore.get(current) || 0) + neighbor.weight;
+            
+            if (!gScore.has(neighbor.id) || tentativeGScore < gScore.get(neighbor.id)!) {
+                // This path is better than any previous one
                 cameFrom.set(neighbor.id, current);
                 gScore.set(neighbor.id, tentativeGScore);
-                fScore.set(neighbor.id, tentativeGScore + heuristic(neighbor.id, goalNodeId));
                 
-                if (!openSet.includes(neighbor.id)) {
-                    openSet.push(neighbor.id);
-                }
+                const f = tentativeGScore + heuristic(neighbor.id, goalNodeId);
+                fScore.set(neighbor.id, f);
+                
+                openSet.enqueue(neighbor.id, f);
             }
         }
     }
@@ -50,11 +108,26 @@ export function aStarAlgorithm(
     return new SearchResult([], 0); // No path found
 }
 
-function reconstructPath(cameFrom: Map<string, string>, current: string): string[] {
-    const totalPath = [current];
-    while (cameFrom.has(current)) {
-        current = cameFrom.get(current)!;
-        totalPath.unshift(current);
+function reconstructPath(
+    graph: Graph,
+    cameFrom: Map<string, string>, 
+    startNodeId: string,
+    goalNodeId: string,
+    totalCost: number
+): SearchResult {
+    const path: string[] = [goalNodeId];
+    let current = goalNodeId;
+    
+    while (current !== startNodeId) {
+        const parent = cameFrom.get(current);
+        if (!parent) {
+            // No path exists
+            return new SearchResult([], 0);
+        }
+        
+        path.unshift(parent);
+        current = parent;
     }
-    return totalPath;
+    
+    return new SearchResult(path, totalCost);
 }

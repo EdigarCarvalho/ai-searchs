@@ -3,27 +3,56 @@ import { SearchResult } from '../../models/SearchResult';
 
 type Heuristic = (a: string, b: string) => number;
 
+// Priority Queue for more efficient node selection
+class PriorityQueue<T> {
+    private items: Array<{ item: T, priority: number }>;
+
+    constructor() {
+        this.items = [];
+    }
+
+    enqueue(item: T, priority: number): void {
+        this.items.push({ item, priority });
+        this.items.sort((a, b) => a.priority - b.priority);
+    }
+
+    dequeue(): T | undefined {
+        return this.items.shift()?.item;
+    }
+
+    isEmpty(): boolean {
+        return this.items.length === 0;
+    }
+    
+    includes(item: T): boolean {
+        return this.items.some(i => i.item === item);
+    }
+}
+
 export function greedySearch(
     graph: Graph, 
     startNodeId: string, 
     goalNodeId: string,
     heuristic: Heuristic
 ): SearchResult {
-    const openSet: string[] = [startNodeId];
+    // Quick check if start and end are the same
+    if (startNodeId === goalNodeId) {
+        return new SearchResult([startNodeId], 0);
+    }
+    
+    const openQueue = new PriorityQueue<string>();
+    openQueue.enqueue(startNodeId, heuristic(startNodeId, goalNodeId));
+    
     const closedSet = new Set<string>();
     const cameFrom = new Map<string, string>();
     
-    while (openSet.length > 0) {
-        // Sort openSet by heuristic value (ascending)
-        openSet.sort((a, b) => heuristic(a, goalNodeId) - heuristic(b, goalNodeId));
-        
+    while (!openQueue.isEmpty()) {
         // Get the node with lowest heuristic value
-        const current = openSet.shift()!;
+        const current = openQueue.dequeue()!;
         
         // If we found the goal, reconstruct and return the path
         if (current === goalNodeId) {
-            const path = reconstructPath(cameFrom, current);
-            return new SearchResult(path, calculateTotalDistance(graph, path));
+            return reconstructPath(graph, cameFrom, startNodeId, goalNodeId);
         }
         
         // Mark as explored
@@ -35,9 +64,9 @@ export function greedySearch(
                 continue; // Skip already explored nodes
             }
             
-            if (!openSet.includes(neighbor.id)) {
+            if (!openQueue.includes(neighbor.id)) {
                 cameFrom.set(neighbor.id, current);
-                openSet.push(neighbor.id);
+                openQueue.enqueue(neighbor.id, heuristic(neighbor.id, goalNodeId));
             }
         }
     }
@@ -45,21 +74,27 @@ export function greedySearch(
     return new SearchResult([], 0); // No path found
 }
 
-function reconstructPath(cameFrom: Map<string, string>, current: string): string[] {
-    const totalPath = [current];
-    while (cameFrom.has(current)) {
-        current = cameFrom.get(current)!;
-        totalPath.unshift(current);
-    }
-    return totalPath;
-}
-
-function calculateTotalDistance(graph: Graph, path: string[]): number {
+function reconstructPath(
+    graph: Graph,
+    cameFrom: Map<string, string>, 
+    startNodeId: string,
+    goalNodeId: string
+): SearchResult {
+    const path: string[] = [goalNodeId];
+    let current = goalNodeId;
     let totalDistance = 0;
     
-    for (let i = 0; i < path.length - 1; i++) {
-        totalDistance += graph.getEdgeWeight(path[i], path[i + 1]);
+    while (current !== startNodeId) {
+        const parent = cameFrom.get(current);
+        if (!parent) {
+            // No path exists
+            return new SearchResult([], 0);
+        }
+        
+        path.unshift(parent);
+        totalDistance += graph.getEdgeWeight(parent, current);
+        current = parent;
     }
     
-    return totalDistance;
+    return new SearchResult(path, totalDistance);
 }
