@@ -1,14 +1,18 @@
 import { Graph } from '../../models/Graph';
 import { SearchResult } from '../../models/SearchResult';
 
-export function breadthFirstSearch(graph: Graph, startNodeId: string): SearchResult {
-    const result = new SearchResult([], 0);
+export function breadthFirstSearch(graph: Graph, startNodeId: string, goalNodeId: string = 'Bucharest'): SearchResult {
     const visited = new Set<string>([startNodeId]);
     const queue: string[] = [startNodeId];
+    const parent: Map<string, string> = new Map(); // To track the path
     
     while (queue.length > 0) {
         const currentNodeId = queue.shift()!;
-        result.path.push(currentNodeId);
+        
+        // If we found the goal, reconstruct and return the path
+        if (currentNodeId === goalNodeId) {
+            return reconstructPath(graph, startNodeId, goalNodeId, parent);
+        }
         
         const neighbors = graph.getNeighbors(currentNodeId);
         
@@ -16,21 +20,35 @@ export function breadthFirstSearch(graph: Graph, startNodeId: string): SearchRes
             if (!visited.has(neighbor.id)) {
                 visited.add(neighbor.id);
                 queue.push(neighbor.id);
+                parent.set(neighbor.id, currentNodeId);
             }
         }
     }
     
-    // Calculate total distance
-    result.totalDistance = calculateTotalDistance(graph, result.path);
-    return result;
+    // If we didn't find a path to the goal
+    return new SearchResult([], 0);
 }
 
-function calculateTotalDistance(graph: Graph, path: string[]): number {
+function reconstructPath(graph: Graph, startNodeId: string, goalNodeId: string, parent: Map<string, string>): SearchResult {
+    const path: string[] = [];
+    let current = goalNodeId;
     let totalDistance = 0;
     
-    for (let i = 0; i < path.length - 1; i++) {
-        totalDistance += graph.getEdgeWeight(path[i], path[i + 1]);
+    // Reconstruct the path from goal to start
+    while (current !== startNodeId) {
+        path.unshift(current);
+        const parentNode = parent.get(current);
+        if (!parentNode) {
+            // No path exists
+            return new SearchResult([], 0);
+        }
+        
+        totalDistance += graph.getEdgeWeight(parentNode, current);
+        current = parentNode;
     }
     
-    return totalDistance;
+    // Add the start node
+    path.unshift(startNodeId);
+    
+    return new SearchResult(path, totalDistance);
 }

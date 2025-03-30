@@ -1,14 +1,14 @@
 // Define interfaces for our data structures
-interface CityConnections {
+export interface CityConnections {
   [city: string]: number;
 }
 
-interface RomaniaMap {
+export interface RomaniaMap {
   [city: string]: CityConnections;
 }
 
 // Map of Romania cities with their connections and distances
-const romaniaCities: RomaniaMap = {
+export const romaniaCities: RomaniaMap = {
   Arad: { 
     Zerind: 75, 
     Sibiu: 140, 
@@ -98,7 +98,7 @@ const romaniaCities: RomaniaMap = {
 };
 
 // Straight-line distances to Bucharest (used for heuristic calculations)
-const straightLineDistanceToBucharest: {[city: string]: number} = {
+export const straightLineDistanceToBucharest: {[city: string]: number} = {
   Arad: 366,
   Bucharest: 0,
   Craiova: 160,

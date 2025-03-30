@@ -58,7 +58,7 @@ export async function setupEventHandlers() {
         
         switch (algorithm) {
             case 'bfs':
-                result = breadthFirstSearch(graph, startNode);
+                result = breadthFirstSearch(graph, startNode, endNode);
                 break;
             case 'ucs':
                 result = uniformCostSearch(graph, startNode);
