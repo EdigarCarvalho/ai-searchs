@@ -9,17 +9,50 @@
 <body>
     <div id="app">
         <h1>Search Algorithms Visualization</h1>
-        <div>
-            <label for="startNode">Start Node:</label>
-            <input type="text" id="startNode" placeholder="Enter start node">
+
+        <div class="form-group">
+            <label for="startNodeInput">Start Node:</label>
+            <input type="text" id="startNodeInput" placeholder="Enter start node (e.g. Arad)" value="Arad">
         </div>
-        <div>
-            <label for="goalNode">Goal Node:</label>
-            <input type="text" id="goalNode" placeholder="Enter goal node">
+
+        <div class="form-group">
+            <label for="endNodeInput">Goal Node:</label>
+            <input type="text" id="endNodeInput" placeholder="Enter goal node (e.g. Bucharest)" value="Bucharest">
         </div>
-        <button id="runSearch">Run Search</button>
+
+        <div class="form-group">
+            <label for="algorithmSelect">Algorithm:</label>
+            <select id="algorithmSelect" class="form-control">
+                <option value="bfs">Breadth-First Search</option>
+                <option value="ucs">Uniform Cost Search</option>
+                <option value="dfs">Depth-First Search</option>
+                <option value="lds">Limited Depth Search</option>
+                <option value="ids">Iterative Deepening Search</option>
+                <option value="directional">Bidirectional Search</option>
+                <option value="greedy">Greedy Best-First Search</option>
+                <option value="astar" selected>A* Algorithm</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="heuristicSelect">Heuristic (for informed search):</label>
+            <select id="heuristicSelect" class="form-control">
+                <option value="manhattan" selected>Straight-line distance</option>
+                <option value="euclidean">Euclidean distance</option>
+                <option value="zero">Zero heuristic (Dijkstra)</option>
+            </select>
+        </div>
+
+        <button id="searchButton">Find Path</button>
+
+        <div id="visualization-container">
+            <div id="map-display"></div>
+            <div id="searchStats"></div>
+        </div>
+
         <div id="results"></div>
     </div>
-    <script src="../dist/bundle.js"></script>
+    
+    <script src="./dist/bundle.js"></script>
 </body>
 </html>
