@@ -14,6 +14,8 @@ import { loadMap } from '../utils/mapLoader';
 import { visualizePath } from '../utils/pathVisualizer';
 import { manhattanDistance, euclideanDistance, zeroHeuristic } from '../utils/heuristics';
 
+
+
 export async function setupEventHandlers() {
     const searchButton = document.getElementById('searchButton');
     const algorithmSelect = document.getElementById('algorithmSelect') as HTMLSelectElement;

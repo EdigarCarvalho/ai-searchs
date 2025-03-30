@@ -4,7 +4,8 @@
   "description": "Visualization of different search algorithms for mapping routes",
   "scripts": {
     "build": "pnpm tsc && pnpm webpack",
-    "dev": "pnpm webpack serve --open",
+
+    "dev": "pnpm tsc && pnpm webpack serve --open",
     "start": "pnpm build && pnpm serve dist"
   },
   "dependencies": {
