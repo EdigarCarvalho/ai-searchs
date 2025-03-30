@@ -29,6 +29,9 @@ export async function setupEventHandlers() {
     const graph = await loadMap();
     
     searchButton.addEventListener('click', () => {
+        console.log('Search button clicked');
+        
+
         const algorithm = algorithmSelect.value;
         const startNode = startNodeInput.value;
         const endNode = endNodeInput?.value || 'Bucharest'; // Default to Bucharest if not specified
@@ -95,6 +98,9 @@ export async function setupEventHandlers() {
                 break;
         }
         
+        console.log(result);
+        
+
         // Display the result
         visualizePath(result.path, result.totalDistance);
         

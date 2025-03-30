@@ -1,31 +1,20 @@
 {
-  "name": "search-algorithms-ts",
+  "name": "search-algorithms-visualization",
   "version": "1.0.0",
-  "description": "A TypeScript project implementing various search algorithms for mapping different routes.",
-  "main": "src/app.ts",
+  "description": "Visualization of different search algorithms for mapping routes",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/app.js",
-    "test": "jest"
+    "build": "pnpm tsc && pnpm webpack",
+    "dev": "pnpm webpack serve --open",
+    "start": "pnpm build && pnpm serve dist"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/search-algorithms-ts.git"
-  },
-  "keywords": [
-    "search",
-    "algorithms",
-    "typescript",
-    "mapping"
-  ],
-  "author": "Your Name",
-  "license": "MIT",
   "dependencies": {
-    "typescript": "^4.5.4",
-    "jest": "^27.0.6"
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
-    "@types/jest": "^27.0.2",
-    "@types/node": "^16.11.7"
+    "ts-loader": "^9.4.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+    "serve": "^14.2.0"
   }
 }
