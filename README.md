@@ -2,6 +2,8 @@
 
 Este projeto implementa um algoritmo de buscas para encontrar diferentes rotas com base no mapa fornecido. O algoritmo solicita ao usuário a origem e o destino do translado e retorna os resultados de diversas estratégias de busca, incluindo o somatório das distâncias percorridas.
 
+https://github.com/user-attachments/assets/b61ccb88-a788-43d2-9b95-0532028c20b7
+
 ## Estratégias de Busca Implementadas
 
 ### 1. Buscas sem Informação (Buscas Cegas)
