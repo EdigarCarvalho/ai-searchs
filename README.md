@@ -29,7 +29,7 @@ https://github.com/user-attachments/assets/b61ccb88-a788-43d2-9b95-0532028c20b7
 ### Instalação
 1. Clone o repositório
    ```bash
-   git clone [url-do-repositorio]
+   git clone https://github.com/EdigarCarvalho/ai-searchs.git
    cd ifma/ai
    ```
 
@@ -85,7 +85,7 @@ This project implements a search algorithm to find different routes based on the
 ### Installation
 1. Clone the repository
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/EdigarCarvalho/ai-searchs.git
    cd ifma/ai
    ```
 
